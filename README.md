@@ -1,5 +1,5 @@
 <p align="center">
-  <em> Clawdbot_Scanner</em>
+  <h1 align="center"><strong>Clawdbot_Scanner</strong></h1>
 </p>
 <p align="center">
   <em>Clawdbot / MOLTBOT Vulnerability Scanner & Exploitation Tool</em>
