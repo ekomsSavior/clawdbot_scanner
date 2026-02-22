@@ -15,7 +15,9 @@
   <em>A comprehensive, interactive security assessment tool for Clawdbot and MOLTBOT instances. This scanner automates the discovery and exploitation of common vulnerabilities including exposed admin interfaces, prompt injection, credential exposure, malicious skills, SSH vulnerabilities, and CVE-2026-25253.</em>
 </p>
 
-## Features
+<p align="center">
+  <h1 align="center"><strong>Features</strong></h1>
+</p>
 
 - **Service Discovery** - Automatically finds Clawdbot instances on a network
   - Scans for port 18789/tcp (Clawdbot control interface)
