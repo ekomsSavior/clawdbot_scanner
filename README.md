@@ -10,7 +10,10 @@
  
 </p>
 
-A comprehensive, interactive security assessment tool for Clawdbot and MOLTBOT instances. This scanner automates the discovery and exploitation of common vulnerabilities including exposed admin interfaces, prompt injection, credential exposure, malicious skills, SSH vulnerabilities, and CVE-2026-25253.
+</p>
+<p align="center">
+  <em>A comprehensive, interactive security assessment tool for Clawdbot and MOLTBOT instances. This scanner automates the discovery and exploitation of common vulnerabilities including exposed admin interfaces, prompt injection, credential exposure, malicious skills, SSH vulnerabilities, and CVE-2026-25253.</em>
+</p>
 
 ## Features
 
