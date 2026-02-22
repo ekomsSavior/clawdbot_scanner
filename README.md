@@ -14,7 +14,7 @@ A comprehensive, interactive security assessment tool for Clawdbot and MOLTBOT i
 
 ## Features
 
-- **Service Discovery** - Automatically finds Clawdbot instances on your network
+- **Service Discovery** - Automatically finds Clawdbot instances on a network
   - Scans for port 18789/tcp (Clawdbot control interface)
   - Detects SSH services on port 22/tcp
   - mDNS service discovery for Clawdbot instances
