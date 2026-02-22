@@ -1,241 +1,392 @@
 <p align="center">
   <h1 align="center"><strong>Clawdbot_Scanner</strong></h1>
 </p>
+
 <p align="center">
   <em>Clawdbot / MOLTBOT Vulnerability Scanner & Exploitation Tool</em>
 </p>
+
 <p align="center">
-
   <img src="https://img.shields.io/badge/ek0ms%20savi0r-white.svg" alt="ek0ms_savi0r">
- 
 </p>
 
-</p>
 <p align="center">
   <em>A comprehensive, interactive security assessment tool for Clawdbot and MOLTBOT instances. This scanner automates the discovery and exploitation of common vulnerabilities including exposed admin interfaces, prompt injection, credential exposure, malicious skills, SSH vulnerabilities, and CVE-2026-25253.</em>
 </p>
 
+<br>
+
 <p align="center">
-  <h1 align="center"><strong>Features</strong></h1>
+  <h2 align="center"><strong>Features</strong></h2>
 </p>
 
-- **Service Discovery** - Automatically finds Clawdbot instances on a network
-  - Scans for port 18789/tcp (Clawdbot control interface)
-  - Detects SSH services on port 22/tcp
-  - mDNS service discovery for Clawdbot instances
-  - Banner grabbing and service identification
+<p align="center">
+  <strong>Service Discovery</strong> - Automatically finds Clawdbot instances on a network
+</p>
+<p align="center">
+  • Scans for port 18789/tcp (Clawdbot control interface)<br>
+  • Detects SSH services on port 22/tcp<br>
+  • mDNS service discovery for Clawdbot instances<br>
+  • Banner grabbing and service identification
+</p>
 
-- **SSH Vulnerability Assessment**
-  - Tests default credentials against SSH services
-  - Checks for vulnerable OpenSSH versions
-  - Identifies weak cipher algorithms
-  - Interactive shell access when credentials are found
+<br>
 
-- **Exposed Administrative Interfaces**
-  - Scans for common admin panels and dashboards
-  - Tests default credentials
-  - Attempts remote command execution
+<p align="center">
+  <strong>SSH Vulnerability Assessment</strong>
+</p>
+<p align="center">
+  • Tests default credentials against SSH services<br>
+  • Checks for vulnerable OpenSSH versions<br>
+  • Identifies weak cipher algorithms<br>
+  • Interactive shell access when credentials are found
+</p>
 
-- **Prompt Injection Testing**
-  - Tests AI/chat endpoints for injection vulnerabilities
-  - Detects sensitive data leakage
-  - Identifies command execution vectors
+<br>
 
-- **Credential Exposure**
-  - Scans for exposed configuration files
-  - Extracts API keys, passwords, and tokens
-  - Discovers SSH private keys
+<p align="center">
+  <strong>Exposed Administrative Interfaces</strong>
+</p>
+<p align="center">
+  • Scans for common admin panels and dashboards<br>
+  • Tests default credentials<br>
+  • Attempts remote command execution
+</p>
 
-- **Malicious Skills/Extensions**
-  - Identifies skill management endpoints
-  - Attempts to upload malicious skills
-  - Sets up callbacks for data exfiltration
+<br>
 
-- **CVE-2026-25253 Exploitation**
-  - Tests for WebSocket token leakage vulnerability
-  - Redirects bot connections to attacker-controlled server
-  - Captures authentication tokens
+<p align="center">
+  <strong>Prompt Injection Testing</strong>
+</p>
+<p align="center">
+  • Tests AI/chat endpoints for injection vulnerabilities<br>
+  • Detects sensitive data leakage<br>
+  • Identifies command execution vectors
+</p>
 
-## Installation
+<br>
 
-Clone the repository:
+<p align="center">
+  <strong>Credential Exposure</strong>
+</p>
+<p align="center">
+  • Scans for exposed configuration files<br>
+  • Extracts API keys, passwords, and tokens<br>
+  • Discovers SSH private keys
+</p>
 
-```bash
-git clone https://github.com/ekomsSavior/clawdbot_scanner.git
-cd clawdbot_scanner
-```
+<br>
 
-Install dependencies:
+<p align="center">
+  <strong>Malicious Skills/Extensions</strong>
+</p>
+<p align="center">
+  • Identifies skill management endpoints<br>
+  • Attempts to upload malicious skills<br>
+  • Sets up callbacks for data exfiltration
+</p>
 
-```bash
-sudo apt update
-sudo apt install python3-pip avahi-utils -y
-pip3 install requests paramiko --break-system-packages
-```
+<br>
 
-Make the script executable:
+<p align="center">
+  <strong>CVE-2026-25253 Exploitation</strong>
+</p>
+<p align="center">
+  • Tests for WebSocket token leakage vulnerability<br>
+  • Redirects bot connections to attacker-controlled server<br>
+  • Captures authentication tokens
+</p>
 
-```bash
-chmod +x clawdbot_scanner.py
-```
+<br>
 
-## How to Run the Tool
+<p align="center">
+  <h2 align="center"><strong>Installation</strong></h2>
+</p>
 
-```bash
-python3 clawdbot_scanner.py
-```
+<p align="center">
+  Clone the repository:
+</p>
 
-## What the Tool Does (Step by Step)
+<p align="center">
+  <code>git clone https://github.com/ekomsSavior/clawdbot_scanner.git</code><br>
+  <code>cd clawdbot_scanner</code>
+</p>
 
-When you run the tool, it will guide you through the following phases:
+<p align="center">
+  Install dependencies:
+</p>
 
-### Phase 1: Service Discovery
-The tool will first ask how you want to discover targets:
-- **Single host** - Scan one specific IP address
-- **Network range** - Scan a subnet (e.g., 192.168.1.0/24)
-- **Import from file** - Load targets from a text file
+<p align="center">
+  <code>sudo apt update</code><br>
+  <code>sudo apt install python3-pip avahi-utils -y</code><br>
+  <code>pip3 install requests paramiko --break-system-packages</code>
+</p>
 
-It will then scan for:
-- Port 18789/tcp (Clawdbot HTTP control interface)
-- Port 22/tcp (SSH services)
-- Additional ports like 80, 443, 8080, 8443
-- mDNS services advertising Clawdbot instances
+<p align="center">
+  Make the script executable:
+</p>
 
-### Phase 2: Target Selection
-After discovery, the tool will show you all found hosts and their open ports. You can choose to scan:
-- All discovered hosts
-- Only confirmed Clawdbot instances
-- Specific hosts by number
+<p align="center">
+  <code>chmod +x clawdbot_scanner.py</code>
+</p>
 
-### Phase 3: SSH Vulnerability Assessment
-For hosts with port 22 open, the tool will:
-- Grab SSH banners and check for vulnerable versions
-- Test default credentials against SSH (root/root, admin/admin, etc.)
-- Check for weak cipher algorithms
-- Report any findings with severity levels (CRITICAL, HIGH, MEDIUM, INFO)
+<br>
 
-### Phase 4: HTTP Interface Scanning
-For hosts with web interfaces, the tool will scan for:
-- Exposed admin panels (/admin, /dashboard, etc.)
-- Chat/API endpoints vulnerable to prompt injection
-- Exposed credential files (.env, .git/config, etc.)
-- Skill management endpoints
-- CVE-2026-25253 WebSocket vulnerabilities
+<p align="center">
+  <h2 align="center"><strong>How to Run the Tool</strong></h2>
+</p>
 
-### Phase 5: Exploitation
-For each vulnerability found, the tool will ask if you want to attempt exploitation:
-- **Admin interfaces** - Tries default passwords, then attempts RCE
-- **Prompt injection** - Sends payloads to leak sensitive data
-- **Exposed credentials** - Extracts and saves API keys, passwords, SSH keys
-- **Malicious skills** - Attempts to upload backdoor skills
-- **CVE-2026-25253** - Redirects WebSocket connections to your listener
-- **SSH** - Opens interactive shells when credentials are found
+<p align="center">
+  <code>python3 clawdbot_scanner.py</code>
+</p>
 
-## What to Expect During Scanning
+<br>
 
-### Prompts You'll See
-```
-Enter target IP or domain [192.168.1.100]: 
-Use HTTPS? (y/n): n
-Enter port (default is 18789 for Clawdbot) [18789]: 
-```
+<p align="center">
+  <h2 align="center"><strong>What the Tool Does (Step by Step)</strong></h2>
+</p>
 
-### Discovery Results
-```
-[*] Host: 192.168.1.105
-    - Port 18789/HTTP [CLAWDBOT]
-      Banner: HTTP/1.1 200 OK - Server: Clawdbot/1.2.3
-    - Port 22/SSH
-      Banner: SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.7
-```
+<p align="center">
+  <strong>Phase 1: Service Discovery</strong>
+</p>
+<p align="center">
+  The tool will first ask how you want to discover targets:<br>
+  • <strong>Single host</strong> - Scan one specific IP address<br>
+  • <strong>Network range</strong> - Scan a subnet (e.g., 192.168.1.0/24)<br>
+  • <strong>Import from file</strong> - Load targets from a text file
+</p>
 
-### Vulnerability Findings
-```
-[CRITICAL] Default SSH Credentials: Successfully authenticated with root:root
-[HIGH] Vulnerable SSH Version: Version 7.6 may be vulnerable to CVE-2018-15473
-! FOUND: http://192.168.1.105:18789/admin (200 OK) - EXPOSED!
-```
+<p align="center">
+  It will then scan for:<br>
+  • Port 18789/tcp (Clawdbot HTTP control interface)<br>
+  • Port 22/tcp (SSH services)<br>
+  • Additional ports like 80, 443, 8080, 8443<br>
+  • mDNS services advertising Clawdbot instances
+</p>
 
-### Exploitation Options
-```
-[1] Attempt to exploit admin interfaces? (y/n): y
-[2] Attempt prompt injection attacks? (y/n): y
-[3] Use exposed credentials? (y/n): y
-```
+<br>
 
-## What to Do With the Results
+<p align="center">
+  <strong>Phase 2: Target Selection</strong>
+</p>
+<p align="center">
+  After discovery, the tool will show you all found hosts and their open ports. You can choose to scan:<br>
+  • All discovered hosts<br>
+  • Only confirmed Clawdbot instances<br>
+  • Specific hosts by number
+</p>
 
-### Files Created
-- **leaked_data.txt** - Contains any sensitive data extracted from successful prompt injections
-- **credentials_found.txt** - Stores all discovered credentials (API keys, passwords, SSH keys)
+<br>
 
-### Listeners to Set Up
-For certain exploits, you'll need to start listeners on your attacker machine:
+<p align="center">
+  <strong>Phase 3: SSH Vulnerability Assessment</strong>
+</p>
+<p align="center">
+  For hosts with port 22 open, the tool will:<br>
+  • Grab SSH banners and check for vulnerable versions<br>
+  • Test default credentials against SSH (root/root, admin/admin, etc.)<br>
+  • Check for weak cipher algorithms<br>
+  • Report any findings with severity levels (CRITICAL, HIGH, MEDIUM, INFO)
+</p>
 
-**For HTTP exfiltration** (port 8080):
-```bash
-nc -lvnp 8080
-```
+<br>
 
-**For reverse shells** (port 4444):
-```bash
-nc -lvnp 4444
-```
+<p align="center">
+  <strong>Phase 4: HTTP Interface Scanning</strong>
+</p>
+<p align="center">
+  For hosts with web interfaces, the tool will scan for:<br>
+  • Exposed admin panels (/admin, /dashboard, etc.)<br>
+  • Chat/API endpoints vulnerable to prompt injection<br>
+  • Exposed credential files (.env, .git/config, etc.)<br>
+  • Skill management endpoints<br>
+  • CVE-2026-25253 WebSocket vulnerabilities
+</p>
 
-**For WebSocket token capture** (port 8080):
-```bash
-python3 -m websocket-server --port 8080
-```
+<br>
 
-### Post-Exploitation
-- Use captured credentials to access other services
-- Leverage SSH access to explore the filesystem
-- Use admin panel access to modify bot behavior
-- Extract tokens from CVE-2026-25253 to impersonate the bot
+<p align="center">
+  <strong>Phase 5: Exploitation</strong>
+</p>
+<p align="center">
+  For each vulnerability found, the tool will ask if you want to attempt exploitation:<br>
+  • <strong>Admin interfaces</strong> - Tries default passwords, then attempts RCE<br>
+  • <strong>Prompt injection</strong> - Sends payloads to leak sensitive data<br>
+  • <strong>Exposed credentials</strong> - Extracts and saves API keys, passwords, SSH keys<br>
+  • <strong>Malicious skills</strong> - Attempts to upload backdoor skills<br>
+  • <strong>CVE-2026-25253</strong> - Redirects WebSocket connections to your listener<br>
+  • <strong>SSH</strong> - Opens interactive shells when credentials are found
+</p>
 
-## Example Session Walkthrough
+<br>
 
-```
-$ python3 clawdbot_scanner.py
+<p align="center">
+  <h2 align="center"><strong>What to Expect During Scanning</strong></h2>
+</p>
 
-============================================================
-  MODULE 0: Clawdbot Service Discovery
-============================================================
-Choose scan method: (1) Single host, (2) Network range, (3) Import from file [1]: 2
-Enter network range (e.g., 192.168.1.0/24): 192.168.1.0/24
+<p align="center">
+  <strong>Prompts You'll See</strong>
+</p>
 
-[*] Scanning 192.168.1.0/24 for Clawdbot instances...
-    Testing 192.168.1.105:18789... 
-    Found: 192.168.1.105:18789 (HTTP)
-    Testing 192.168.1.110:22...
-    [*] Found SSH on 192.168.1.110:22
+<p align="center">
+  <code>Enter target IP or domain [192.168.1.100]:</code><br>
+  <code>Use HTTPS? (y/n): n</code><br>
+  <code>Enter port (default is 18789 for Clawdbot) [18789]:</code>
+</p>
 
-============================================================
-  DISCOVERED SERVICES
-============================================================
-[*] Host: 192.168.1.105
-    - Port 18789/HTTP [CLAWDBOT]
-    - Port 22/SSH
+<br>
 
-[?] Which hosts would you like to scan? 
-    1. All discovered hosts
-    2. Only Clawdbot instances
-    3. Select specific hosts
-Choose option [1]: 1
+<p align="center">
+  <strong>Discovery Results</strong>
+</p>
 
-============================================================
-  SSH VULNERABILITY ASSESSMENT: 192.168.1.105:22
-============================================================
-   SSH service is accessible
-   SSH Banner: SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.7
-   Testing default SSH credentials...
-   SUCCESS! Logged in with root:root
-```
+<p align="center">
+  <code>[*] Host: 192.168.1.105</code><br>
+  <code>    - Port 18789/HTTP [CLAWDBOT]</code><br>
+  <code>      Banner: HTTP/1.1 200 OK - Server: Clawdbot/1.2.3</code><br>
+  <code>    - Port 22/SSH</code><br>
+  <code>      Banner: SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.7</code>
+</p>
 
-## Disclaimer
+<br>
 
-This software is provided for educational and authorized security testing purposes only. The author assumes no liability and is not responsible for any misuse or damage caused by this program. By using this software, you agree to use it responsibly and in compliance with all applicable laws and regulations.
+<p align="center">
+  <strong>Vulnerability Findings</strong>
+</p>
 
+<p align="center">
+  <code>[CRITICAL] Default SSH Credentials: Successfully authenticated with root:root</code><br>
+  <code>[HIGH] Vulnerable SSH Version: Version 7.6 may be vulnerable to CVE-2018-15473</code><br>
+  <code>! FOUND: http://192.168.1.105:18789/admin (200 OK) - EXPOSED!</code>
+</p>
 
-<img width="500" height="500" alt="Untitled_Artwork" src="https://github.com/user-attachments/assets/6937c37e-d490-4e6a-bf39-1888c0c133e8" />
+<br>
 
+<p align="center">
+  <strong>Exploitation Options</strong>
+</p>
+
+<p align="center">
+  <code>[1] Attempt to exploit admin interfaces? (y/n): y</code><br>
+  <code>[2] Attempt prompt injection attacks? (y/n): y</code><br>
+  <code>[3] Use exposed credentials? (y/n): y</code>
+</p>
+
+<br>
+
+<p align="center">
+  <h2 align="center"><strong>What to Do With the Results</strong></h2>
+</p>
+
+<p align="center">
+  <strong>Files Created</strong>
+</p>
+<p align="center">
+  • <strong>leaked_data.txt</strong> - Contains any sensitive data extracted from successful prompt injections<br>
+  • <strong>credentials_found.txt</strong> - Stores all discovered credentials (API keys, passwords, SSH keys)
+</p>
+
+<br>
+
+<p align="center">
+  <strong>Listeners to Set Up</strong>
+</p>
+<p align="center">
+  For certain exploits, you'll need to start listeners on your attacker machine:
+</p>
+
+<p align="center">
+  <strong>For HTTP exfiltration (port 8080):</strong><br>
+  <code>nc -lvnp 8080</code>
+</p>
+
+<p align="center">
+  <strong>For reverse shells (port 4444):</strong><br>
+  <code>nc -lvnp 4444</code>
+</p>
+
+<p align="center">
+  <strong>For WebSocket token capture (port 8080):</strong><br>
+  <code>python3 -m websocket-server --port 8080</code>
+</p>
+
+<br>
+
+<p align="center">
+  <strong>Post-Exploitation</strong>
+</p>
+<p align="center">
+  • Use captured credentials to access other services<br>
+  • Leverage SSH access to explore the filesystem<br>
+  • Use admin panel access to modify bot behavior<br>
+  • Extract tokens from CVE-2026-25253 to impersonate the bot
+</p>
+
+<br>
+
+<p align="center">
+  <h2 align="center"><strong>Example Session Walkthrough</strong></h2>
+</p>
+
+<p align="center">
+  <code>$ python3 clawdbot_scanner.py</code>
+</p>
+
+<p align="center">
+  <code>============================================================</code><br>
+  <code>  MODULE 0: Clawdbot Service Discovery</code><br>
+  <code>============================================================</code><br>
+  <code>Choose scan method: (1) Single host, (2) Network range, (3) Import from file [1]: 2</code><br>
+  <code>Enter network range (e.g., 192.168.1.0/24): 192.168.1.0/24</code>
+</p>
+
+<p align="center">
+  <code>[*] Scanning 192.168.1.0/24 for Clawdbot instances...</code><br>
+  <code>    Testing 192.168.1.105:18789... </code><br>
+  <code>    Found: 192.168.1.105:18789 (HTTP)</code><br>
+  <code>    Testing 192.168.1.110:22...</code><br>
+  <code>    [*] Found SSH on 192.168.1.110:22</code>
+</p>
+
+<p align="center">
+  <code>============================================================</code><br>
+  <code>  DISCOVERED SERVICES</code><br>
+  <code>============================================================</code><br>
+  <code>[*] Host: 192.168.1.105</code><br>
+  <code>    - Port 18789/HTTP [CLAWDBOT]</code><br>
+  <code>    - Port 22/SSH</code>
+</p>
+
+<p align="center">
+  <code>[?] Which hosts would you like to scan? </code><br>
+  <code>    1. All discovered hosts</code><br>
+  <code>    2. Only Clawdbot instances</code><br>
+  <code>    3. Select specific hosts</code><br>
+  <code>Choose option [1]: 1</code>
+</p>
+
+<p align="center">
+  <code>============================================================</code><br>
+  <code>  SSH VULNERABILITY ASSESSMENT: 192.168.1.105:22</code><br>
+  <code>============================================================</code><br>
+  <code>   SSH service is accessible</code><br>
+  <code>   SSH Banner: SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.7</code><br>
+  <code>   Testing default SSH credentials...</code><br>
+  <code>   SUCCESS! Logged in with root:root</code>
+</p>
+
+<br>
+
+<p align="center">
+  <h2 align="center"><strong>Disclaimer</strong></h2>
+</p>
+
+<p align="center">
+  This software is provided for educational and authorized security testing purposes only. The author assumes no liability and is not responsible for any misuse or damage caused by this program. By using this software, you agree to use it responsibly and in compliance with all applicable laws and regulations.
+</p>
+
+<br>
+
+<p align="center">
+  <img width="400" alt="Clawdbot Scanner Art" src="https://github.com/user-attachments/assets/6937c37e-d490-4e6a-bf39-1888c0c133e8">
+</p>
