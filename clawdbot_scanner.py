@@ -137,19 +137,19 @@ def print_section(title):
     print(f"{'='*60}")
 
 def print_success(msg):
-    print(f"  {msg}")
+    print(f"   {msg}")
 
 def print_failure(msg):
-    print(f"  {msg}")
+    print(f"   {msg}")
 
 def print_info(msg):
-    print(f"  {msg}")
+    print(f"   {msg}")
 
 def print_warning(msg):
-    print(f"  {msg}")
+    print(f"   {msg}")
 
 def print_found(msg):
-    print(f"  {msg}")
+    print(f"   {msg}")
 
 def ask_yes_no(prompt):
     while True:
@@ -190,11 +190,8 @@ class ServiceDiscovery:
     def scan_network(self):
         """Interactive network discovery for Clawdbot instances"""
         print_section("MODULE 0: Clawdbot Service Discovery")
-        print("This module will help you discover Clawdbot instances on your network.")
-        print("Based on Shodan data, Clawdbot typically uses:")
-        print("  - Port 18789/tcp for HTTP control interface")
-        print("  - Port 22/tcp for SSH access")
-        print("  - Port 5353/udp for mDNS service discovery\n")
+        print("This module will help you discover Clawdbot instances on a network.")
+        print("  - HACK THE PLANET\n")
         
         scan_method = get_input("Choose scan method: (1) Single host, (2) Network range, (3) Import from file", "1")
         
@@ -240,7 +237,7 @@ class ServiceDiscovery:
                     banner_lower = banner.lower()
                     if any(keyword in banner_lower for keyword in ["clawdbot", "openclaw", "moltbot", "claw", "bot"]):
                         is_clawdbot = True
-                        print(f"    CLAWDBOT DETECTED on {target}:{port} ({service_type})")
+                        print(f"     CLAWDBOT DETECTED on {target}:{port} ({service_type})")
                         print(f"         Banner: {banner[:100]}")
                 
                 self.clawdbot_instances.append({
@@ -268,7 +265,7 @@ class ServiceDiscovery:
                     # Check primary Clawdbot port first
                     print(f"    Testing {target}:18789...", end="\r", flush=True)
                     if self._check_port(target, 18789):
-                        print(f"\n    Found: {target}:18789 (HTTP)")
+                        print(f"\n     Found: {target}:18789 (HTTP)")
                         banner = self._grab_http_banner(target, 18789)
                         self.clawdbot_instances.append({
                             "host": target,
@@ -320,7 +317,7 @@ class ServiceDiscovery:
                 )
                 
                 if mdns_result.stdout:
-                    print("    mDNS services found:")
+                    print("     mDNS services found:")
                     for line in mdns_result.stdout.split('\n'):
                         if 'clawdbot' in line.lower() or 'openclaw' in line.lower():
                             print(f"         {line}")
