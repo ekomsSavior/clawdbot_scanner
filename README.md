@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <em>A comprehensive, interactive security assessment tool for Clawdbot and MOLTBOT instances. This scanner automates the discovery and exploitation of common vulnerabilities including exposed admin interfaces, prompt injection, credential exposure, malicious skills, SSH vulnerabilities, and CVE-2026-25253.</em>
+  <em>A comprehensive, interactive security assessment tool for Clawdbot and MOLTBOT instances. This scanner automates the discovery and exploitation of common vulnerabilities including exposed admin interfaces, prompt injection, credential exposure, malicious skills, SSH vulnerabilities, MCP (Model Context Protocol) detection, and CVE-2026-25253.</em>
 </p>
 
 <br>
@@ -89,6 +89,18 @@
 <br>
 
 <p align="center">
+  <strong>MCP (Model Context Protocol) Detection</strong>
+</p>
+<p align="center">
+  • Detects MCP endpoints using JSON-RPC probing<br>
+  • Lists available tools and resources<br>
+  • Flags dangerous or sensitive tools/resources<br>
+  • Interactive tool invocation and resource reading
+</p>
+
+<br>
+
+<p align="center">
   <strong>CVE-2026-25253 Exploitation</strong>
 </p>
 <p align="center">
@@ -147,7 +159,7 @@
 </p>
 
 <p align="center">
-  <strong>Phase 1: Service Discovery</strong>
+  <strong>Phase 1: Service Discovery (Module 0)</strong>
 </p>
 <p align="center">
   The tool will first ask how you want to discover targets:<br>
@@ -179,7 +191,7 @@
 <br>
 
 <p align="center">
-  <strong>Phase 3: SSH Vulnerability Assessment</strong>
+  <strong>Phase 3: SSH Vulnerability Assessment (Module 1)</strong>
 </p>
 <p align="center">
   For hosts with port 22 open, the tool will:<br>
@@ -192,15 +204,47 @@
 <br>
 
 <p align="center">
-  <strong>Phase 4: HTTP Interface Scanning</strong>
+  <strong>Phase 4: HTTP Interface Scanning (Modules 2-7)</strong>
 </p>
 <p align="center">
-  For hosts with web interfaces, the tool will scan for:<br>
-  • Exposed admin panels (/admin, /dashboard, etc.)<br>
-  • Chat/API endpoints vulnerable to prompt injection<br>
-  • Exposed credential files (.env, .git/config, etc.)<br>
-  • Skill management endpoints<br>
-  • CVE-2026-25253 WebSocket vulnerabilities
+  For hosts with web interfaces, the tool will scan for:
+</p>
+<p align="center">
+  <strong>Module 2: Exposed Admin Interfaces</strong><br>
+  • Scans for common admin panels and dashboards<br>
+  • Tests default credentials<br>
+  • Attempts remote command execution
+</p>
+<p align="center">
+  <strong>Module 3: Prompt Injection</strong><br>
+  • Tests AI/chat endpoints for injection vulnerabilities<br>
+  • Detects sensitive data leakage<br>
+  • Identifies command execution vectors
+</p>
+<p align="center">
+  <strong>Module 4: Credential Exposure</strong><br>
+  • Scans for exposed configuration files<br>
+  • Extracts API keys, passwords, and tokens<br>
+  • Discovers SSH private keys
+</p>
+<p align="center">
+  <strong>Module 5: Malicious Skills/Extensions</strong><br>
+  • Identifies skill management endpoints<br>
+  • Attempts to upload malicious skills<br>
+  • Sets up callbacks for data exfiltration
+</p>
+<p align="center">
+  <strong>Module 6: MCP Detection</strong><br>
+  • Probes common MCP endpoints with JSON-RPC requests<br>
+  • Lists available tools and resources<br>
+  • Flags dangerous tools (exec, shell, system) and sensitive resources<br>
+  • Interactive exploitation with tool invocation and resource reading
+</p>
+<p align="center">
+  <strong>Module 7: CVE-2026-25253</strong><br>
+  • Tests for WebSocket token leakage vulnerability<br>
+  • Redirects bot connections to attacker-controlled server<br>
+  • Captures authentication tokens
 </p>
 
 <br>
@@ -214,6 +258,7 @@
   • <strong>Prompt injection</strong> - Sends payloads to leak sensitive data<br>
   • <strong>Exposed credentials</strong> - Extracts and saves API keys, passwords, SSH keys<br>
   • <strong>Malicious skills</strong> - Attempts to upload backdoor skills<br>
+  • <strong>MCP</strong> - Allows interactive tool invocation and resource reading<br>
   • <strong>CVE-2026-25253</strong> - Redirects WebSocket connections to your listener<br>
   • <strong>SSH</strong> - Opens interactive shells when credentials are found
 </p>
@@ -251,12 +296,29 @@
 <br>
 
 <p align="center">
+  <strong>MCP Detection Results</strong>
+</p>
+
+<p align="center">
+  <code>Testing: http://192.168.1.105:18789/api/mcp</code><br>
+  <code>   Potential MCP endpoint: http://192.168.1.105:18789/api/mcp</code><br>
+  <code>  [ℹ]   Response: {'id': 1, 'result': None, 'error': None, 'jsonrpc': '2.0'}</code><br>
+  <code>   Found 3 tools:</code><br>
+  <code>    - execute_command: Run system commands</code><br>
+  <code>    - read_file: Read files from the system</code><br>
+  <code>    - list_directory: List directory contents</code>
+</p>
+
+<br>
+
+<p align="center">
   <strong>Vulnerability Findings</strong>
 </p>
 
 <p align="center">
   <code>[CRITICAL] Default SSH Credentials: Successfully authenticated with root:root</code><br>
   <code>[HIGH] Vulnerable SSH Version: Version 7.6 may be vulnerable to CVE-2018-15473</code><br>
+  <code>[HIGH] Dangerous MCP Tool: Tool 'execute_command' may allow command execution</code><br>
   <code>! FOUND: http://192.168.1.105:18789/admin (200 OK) - EXPOSED!</code>
 </p>
 
@@ -269,7 +331,26 @@
 <p align="center">
   <code>[1] Attempt to exploit admin interfaces? (y/n): y</code><br>
   <code>[2] Attempt prompt injection attacks? (y/n): y</code><br>
-  <code>[3] Use exposed credentials? (y/n): y</code>
+  <code>[3] Use exposed credentials? (y/n): y</code><br>
+  <code>[4] Upload malicious skills? (y/n): y</code><br>
+  <code>[5] Exploit MCP endpoints? (y/n): y</code><br>
+  <code>[6] Exploit CVE-2026-25253? (y/n): y</code>
+</p>
+
+<br>
+
+<p align="center">
+  <strong>MCP Exploitation</strong>
+</p>
+
+<p align="center">
+  <code>Select tool number to invoke (or 0 to skip): 1</code><br>
+  <code>Does this tool require arguments? (y/n): y</code><br>
+  <code>Enter arguments as JSON (e.g., {"cmd":"ls"}): {"cmd":"id"}</code><br>
+  <code>Tool invocation successful!</code><br>
+  <code>{</code><br>
+  <code>  "result": "uid=0(root) gid=0(root) groups=0(root)"</code><br>
+  <code>}</code>
 </p>
 
 <br>
@@ -319,6 +400,7 @@
   • Use captured credentials to access other services<br>
   • Leverage SSH access to explore the filesystem<br>
   • Use admin panel access to modify bot behavior<br>
+  • Invoke MCP tools to execute commands or read files<br>
   • Extract tokens from CVE-2026-25253 to impersonate the bot
 </p>
 
@@ -373,6 +455,19 @@
   <code>   SSH Banner: SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.7</code><br>
   <code>   Testing default SSH credentials...</code><br>
   <code>   SUCCESS! Logged in with root:root</code>
+</p>
+
+<p align="center">
+  <code>============================================================</code><br>
+  <code>  MODULE 6: MCP (Model Context Protocol) Detection</code><br>
+  <code>============================================================</code><br>
+  <code>  Testing: http://192.168.1.105:18789/api/mcp</code><br>
+  <code>   Potential MCP endpoint: http://192.168.1.105:18789/api/mcp</code><br>
+  <code>  [ℹ]   Response: {'id': 1, 'result': None, 'error': None, 'jsonrpc': '2.0'}</code><br>
+  <code>   Found 3 tools:</code><br>
+  <code>    - execute_command: Run system commands</code><br>
+  <code>    - read_file: Read files from the system</code><br>
+  <code>    - list_directory: List directory contents</code>
 </p>
 
 <br>
